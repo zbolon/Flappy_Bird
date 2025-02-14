@@ -3,7 +3,6 @@ import java.awt.event.KeyListener;
 
 public class Key implements KeyListener {
     private boolean jump;
-    private boolean pressed;
 
 
     @Override
@@ -15,8 +14,8 @@ public class Key implements KeyListener {
 
         if (keycode == KeyEvent.VK_SPACE) {
             jump = true;
-            pressed = true;
         }
+
     }
 
     @Override
@@ -25,7 +24,6 @@ public class Key implements KeyListener {
 
         if (keycode == KeyEvent.VK_SPACE){
             jump = false;
-            pressed = false;
         }
 
     }
@@ -35,10 +33,5 @@ public class Key implements KeyListener {
         return jump;
     }
 
-    public boolean isPressed() {
-        return pressed;
-    }
-    public void setPressed(boolean pressed){
-        this.pressed = pressed;
-    }
 }
+
