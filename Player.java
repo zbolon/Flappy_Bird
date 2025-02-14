@@ -2,24 +2,28 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 import javax.imageio.ImageIO;
 
 public class Player extends Entity {
-    private BufferedImage image;
+    private BufferedImage[] image = new BufferedImage[3];
     private Key key;
     private long start_time = System.currentTimeMillis();
     private long current_time;
 
-    private final double yVel = 500; //(m/s)
-    private final double yAcc = 9.81 * 4; // (m/s/s)
-    private double y, yo;
+    private double Voy; //(m/s)
+    private final double a = 9.81 * 10; // (m/s/s)
+    private double y, Yo;
     private double t;
+    private boolean jump_hold = false;
+    private int i, num;
 
 
     //yVel stays the same and yAccel
     //need to know how much time has passed since space bar was pressed (in seconds)
 
+    /*
+        PLAYER IS NOT CENTERED
+     */
 
     public Player(int x, int y, int width, int height, Key key){
         setX(x);
@@ -29,47 +33,63 @@ public class Player extends Entity {
         this.key = key;
 
         try{
-            image = ImageIO.read(new File("/Users/zachbolon/Java/Flappy Bird/Images/bird.png"));
-        } catch (Exception e){
+            image[0] = ImageIO.read(new File("Images/bird.png"));
+            image[1] = ImageIO.read(new File("Images/bird2.png"));
+            image[2] = ImageIO.read(new File("Images/bird3.png"));
+        } catch (IOException e){
             System.out.println("Error");
         }
     }
 
     public void draw(Graphics2D g2){
-        g2.drawImage(image,getX(), getY(), getWidth(), getHeight(), null);
+
+        switch (i){
+            case (0):
+                g2.drawImage(image[0], getX(), getY(), getWidth(), getHeight(), null);
+                break;
+            case (1):
+                g2.drawImage(image[1], getX(), getY(), getWidth(), getHeight(), null);
+            case (2):
+                g2.drawImage(image[2], getX(), getY(), getWidth(), getHeight(), null);
+
+        }
+
     }
 
     public void update(){
-        /*
-        if (key.getJump() & !key.isPressed()){
-            start_time = System.currentTimeMillis();
-            // reset the time and jump up by Vo
-            yo = getY();
-            setY(getY() - 10);
-            key.setPressed(true);
 
-            //make it so that you can't jump, until you reach the max height
+        //always add num
 
+        //check if num is within a range,
+        // whatever range it is within set i to that
+        num++;
+
+        if (num < 10){
+            i = 0;
+        } else if (num < 20){
+            i = 1;
+        } else if (num < 30){
+            i = 2;
         } else {
-            //do calculation
-            // y= 0.5 * a * t^2 + Vot + Yo
-            current_time = System.currentTimeMillis();
-            t = (current_time - start_time) / 1000.0;
-            System.out.println(t);
-            y = (0.5 * yAcc * Math.pow(t, 2)) + yVel * t - yo;
-
-            setY((int) y);
-            //System.out.println(y);
-        }*/
-
-        if (key.isPressed()){
-            setY(getY() - 10);
-        } else {
-            setY(getY() + 1);
+            num = 0;
         }
 
+        // just some physics here
+        if (key.getJump() && !jump_hold){
+            Yo = getY();
+            start_time = System.currentTimeMillis();
+            Voy = -9.81 * 12.5;
+            jump_hold = true;
+        } else if (!key.getJump()){
+            jump_hold = false;
+        }
 
+        current_time = System.currentTimeMillis();
+
+        t = (current_time - start_time) / 250.0;
+
+        y = 0.5 * a * Math.pow(t, 2) + Voy * t + Yo;
+        setY((int)y);
 
     }
-
 }
